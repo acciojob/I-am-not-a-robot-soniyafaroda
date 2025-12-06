@@ -1,10 +1,61 @@
-<h3 id="h">Please click on the identical tiles to verify that you are not a robot.</h3>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Not a Robot Verification</title>
 
-<div id="images"></div>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 20px;
+    }
 
-<button id="reset" style="display:none;">Reset</button>
-<button id="verify" style="display:none;">Verify</button>
+    #container {
+      width: 600px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
 
-<h3 id="result"></h3>
+    .tile {
+      width: 180px;
+      height: 180px;
+      border: 2px solid #555;
+      cursor: pointer;
+    }
 
-<script src="script.js"></script>
+    .selected {
+      border: 4px solid blue;
+    }
+
+    #reset, #verify {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      display: none;
+    }
+
+    #para {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h3 id="h">Please click on the identical tiles to verify that you are not a robot.</h3>
+
+  <div id="container"></div>
+
+  <button id="reset">Reset</button>
+  <button id="verify">Verify</button>
+
+  <p id="para"></p>
+
+  <script src="script.js"></script>
+</body>
+</html>

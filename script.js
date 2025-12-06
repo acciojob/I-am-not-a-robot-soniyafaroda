@@ -1,79 +1,83 @@
-//your code here
-window.onload = function () {
-    const imagesDiv = document.getElementById("images");
-    const resetBtn = document.getElementById("reset");
-    const verifyBtn = document.getElementById("verify");
-    const resultText = document.getElementById("result");
+// Unique images (use your own image paths)
+const uniqueImages = [
+  "https://via.placeholder.com/180?text=A",
+  "https://via.placeholder.com/180?text=B",
+  "https://via.placeholder.com/180?text=C",
+  "https://via.placeholder.com/180?text=D",
+  "https://via.placeholder.com/180?text=E"
+];
 
-    // ---- STEP 1: Prepare Image Set ----
-    let uniqueImages = [
-        "img1.jpg",
-        "img2.jpg",
-        "img3.jpg",
-        "img4.jpg",
-        "img5.jpg"
-    ];
+// STEP 1 → Select one random image to duplicate
+const duplicateIndex = Math.floor(Math.random() * uniqueImages.length);
+const duplicateImage = uniqueImages[duplicateIndex];
 
-    // Pick a random image to duplicate
-    let duplicateImage = uniqueImages[Math.floor(Math.random() * uniqueImages.length)];
+// Create full image set (5 unique + 1 duplicate)
+let images = [...uniqueImages, duplicateImage];
 
-    // Create final 6-image array
-    let finalImages = [...uniqueImages, duplicateImage];
+// STEP 2 → Shuffle images randomly
+images = images.sort(() => Math.random() - 0.5);
 
-    // Shuffle images
-    finalImages.sort(() => Math.random() - 0.5);
+// DOM elements
+const container = document.getElementById("container");
+const resetBtn = document.getElementById("reset");
+const verifyBtn = document.getElementById("verify");
+const para = document.getElementById("para");
 
-    // ---- State Variables ----
-    let selected = [];
+let selectedImages = [];
+let selectedTiles = [];
 
-    // ---- STEP 2: Display Images ----
-    finalImages.forEach((src, index) => {
-        const img = document.createElement("img");
-        img.src = src;
-        img.dataset.index = index;
+// STEP 3 → Load tiles into DOM
+images.forEach((src, index) => {
+  const img = document.createElement("img");
+  img.src = src;
+  img.className = "tile";
+  img.dataset.index = index;
 
-        img.onclick = function () {
-            handleImageClick(img);
-        };
+  img.addEventListener("click", () => handleTileClick(img));
 
-        imagesDiv.appendChild(img);
-    });
+  container.appendChild(img);
+});
 
-    // ---- STEP 3: Handle Image Click ----
-    function handleImageClick(img) {
-        if (selected.length === 2) return; // prevent selecting more than 2
+// FUNCTION → When user clicks an image
+function handleTileClick(img) {
+  // Do not allow more than 2 tiles
+  if (selectedImages.length === 2) return;
 
-        img.classList.add("selected");
-        selected.push(img);
+  // Prevent selecting same tile twice
+  if (selectedTiles.includes(img)) return;
 
-        // STATE 2 → show Reset button
-        resetBtn.style.display = "block";
+  img.classList.add("selected");
 
-        if (selected.length === 2) {
-            // STATE 3 → two selected → show verify button
-            verifyBtn.style.display = "block";
-        }
-    }
+  selectedImages.push(img.src);
+  selectedTiles.push(img);
 
-    // ---- RESET button ----
-    resetBtn.onclick = function () {
-        selected = [];
-        verifyBtn.style.display = "none";
-        resetBtn.style.display = "none";
-        resultText.textContent = "";
-        document.querySelectorAll("#images img").forEach(img => img.classList.remove("selected"));
-    };
+  // Show Reset button when first tile clicked
+  resetBtn.style.display = "inline-block";
 
-    // ---- VERIFY button ----
-    verifyBtn.onclick = function () {
-        verifyBtn.style.display = "none"; // STATE 4
-        const [img1, img2] = selected;
+  // After 2 images selected → Show Verify button
+  if (selectedImages.length === 2) {
+    verifyBtn.style.display = "inline-block";
+  }
+}
 
-        if (img1.src === img2.src) {
-            resultText.textContent = "You are a human. Congratulations!";
-        } else {
-            resultText.textContent = "We can't verify you as a human. You selected the non-identical tiles.";
-        }
-    };
-};
+// FUNCTION → RESET STATE
+resetBtn.addEventListener("click", () => {
+  selectedImages = [];
+  selectedTiles.forEach(tile => tile.classList.remove("selected"));
+  selectedTiles = [];
 
+  verifyBtn.style.display = "none";
+  resetBtn.style.display = "none";
+  para.textContent = "";
+});
+
+// FUNCTION → VERIFY SELECTION
+verifyBtn.addEventListener("click", () => {
+  verifyBtn.style.display = "none"; // hide after verification
+
+  if (selectedImages.length === 2 && selectedImages[0] === selectedImages[1]) {
+    para.textContent = "You are a human. Congratulations!";
+  } else {
+    para.textContent = "We can't verify you as a human. You selected the non-identical tiles.";
+  }
+});
