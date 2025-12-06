@@ -1,83 +1,67 @@
-// Unique images (use your own image paths)
-const uniqueImages = [
-  "https://via.placeholder.com/180?text=A",
-  "https://via.placeholder.com/180?text=B",
-  "https://via.placeholder.com/180?text=C",
-  "https://via.placeholder.com/180?text=D",
-  "https://via.placeholder.com/180?text=E"
+const baseImages = [
+    "https://picsum.photos/id/100/200",
+    "https://picsum.photos/id/101/200",
+    "https://picsum.photos/id/102/200",
+    "https://picsum.photos/id/103/200",
+    "https://picsum.photos/id/104/200"
 ];
 
-// STEP 1 → Select one random image to duplicate
-const duplicateIndex = Math.floor(Math.random() * uniqueImages.length);
-const duplicateImage = uniqueImages[duplicateIndex];
+// pick a random one to duplicate
+let duplicateIndex = Math.floor(Math.random() * baseImages.length);
 
-// Create full image set (5 unique + 1 duplicate)
-let images = [...uniqueImages, duplicateImage];
+// final set with one duplicate
+let finalSet = [...baseImages, baseImages[duplicateIndex]];
 
-// STEP 2 → Shuffle images randomly
-images = images.sort(() => Math.random() - 0.5);
+// shuffle the six images
+finalSet.sort(() => Math.random() - 0.5);
 
-// DOM elements
-const container = document.getElementById("container");
+// assign images to img1..img6
+const tiles = document.querySelectorAll(".tile");
+tiles.forEach((img, i) => {
+    img.src = finalSet[i];
+});
+
+// ---- logic ----
+let selected = [];
 const resetBtn = document.getElementById("reset");
 const verifyBtn = document.getElementById("verify");
 const para = document.getElementById("para");
+const header = document.getElementById("h");
 
-let selectedImages = [];
-let selectedTiles = [];
+tiles.forEach(tile => {
+    tile.addEventListener("click", () => {
+        resetBtn.style.display = "inline-block";
 
-// STEP 3 → Load tiles into DOM
-images.forEach((src, index) => {
-  const img = document.createElement("img");
-  img.src = src;
-  img.className = "tile";
-  img.dataset.index = index;
+        if (selected.length === 2) return;
 
-  img.addEventListener("click", () => handleTileClick(img));
+        tile.classList.add("selected");
+        selected.push(tile);
 
-  container.appendChild(img);
+        if (selected.length === 2) {
+            verifyBtn.style.display = "inline-block";
+        }
+    });
 });
 
-// FUNCTION → When user clicks an image
-function handleTileClick(img) {
-  // Do not allow more than 2 tiles
-  if (selectedImages.length === 2) return;
-
-  // Prevent selecting same tile twice
-  if (selectedTiles.includes(img)) return;
-
-  img.classList.add("selected");
-
-  selectedImages.push(img.src);
-  selectedTiles.push(img);
-
-  // Show Reset button when first tile clicked
-  resetBtn.style.display = "inline-block";
-
-  // After 2 images selected → Show Verify button
-  if (selectedImages.length === 2) {
-    verifyBtn.style.display = "inline-block";
-  }
-}
-
-// FUNCTION → RESET STATE
 resetBtn.addEventListener("click", () => {
-  selectedImages = [];
-  selectedTiles.forEach(tile => tile.classList.remove("selected"));
-  selectedTiles = [];
+    selected = [];
+    verifyBtn.style.display = "none";
+    resetBtn.style.display = "none";
+    para.textContent = "";
 
-  verifyBtn.style.display = "none";
-  resetBtn.style.display = "none";
-  para.textContent = "";
+    tiles.forEach(tile => tile.classList.remove("selected"));
+
+    header.textContent =
+        "Please click on the identical tiles to verify that you are not a robot.";
 });
 
-// FUNCTION → VERIFY SELECTION
 verifyBtn.addEventListener("click", () => {
-  verifyBtn.style.display = "none"; // hide after verification
+    verifyBtn.style.display = "none";
 
-  if (selectedImages.length === 2 && selectedImages[0] === selectedImages[1]) {
-    para.textContent = "You are a human. Congratulations!";
-  } else {
-    para.textContent = "We can't verify you as a human. You selected the non-identical tiles.";
-  }
+    if (selected[0].src === selected[1].src) {
+        para.textContent = "You are a human. Congratulations!";
+    } else {
+        para.textContent =
+            "We can't verify you as a human. You selected the non-identical tiles.";
+    }
 });
